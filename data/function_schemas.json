@@ -1,0 +1,814 @@
+{
+  "find_pairs_with_sum": {
+    "name": "find_pairs_with_sum",
+    "description": "Finds all pairs of integers in a list that sum up to a target value.",
+    "slots": {
+      "nums": {
+        "type": "List[int]",
+        "optional": false,
+        "description": "The list of integers."
+      },
+      "target": {
+        "type": "int",
+        "optional": false,
+        "description": "The target sum value."
+      }
+    }
+  },
+  "numerical_derivative": {
+    "name": "numerical_derivative",
+    "description": "Estimates the derivative of a function at a given point using the central difference formula.",
+    "slots": {
+      "function": {
+        "type": "Callable[[float], float]",
+        "optional": false,
+        "description": "The function to calculate the derivative of."
+      },
+      "x": {
+        "type": "float",
+        "optional": false,
+        "description": "The point at which to estimate the derivative."
+      }
+    }
+  },
+  "draw_cards": {
+    "name": "draw_cards",
+    "description": "Shuffles a standard deck of 52 cards and draws a specified number of cards from the top.",
+    "slots": {
+      "num_draw": {
+        "type": "int, optional",
+        "optional": true,
+        "description": "The number of cards to be drawn. Defaults to 1.",
+        "default": 1
+      }
+    }
+  },
+  "cell_density": {
+    "name": "cell_density",
+    "description": "Calculates the cell density based on the optical density (OD) and dilution factor.",
+    "slots": {
+      "od": {
+        "type": "float",
+        "optional": true,
+        "description": "The optical density of the sample."
+      },
+      "dilution": {
+        "type": "int",
+        "optional": true,
+        "description": "The dilution factor applied to the sample."
+      },
+      "factor": {
+        "type": "float, optional",
+        "optional": true,
+        "description": "The calibration factor for converting OD to cell density. Defaults to 1e9.",
+        "default": 1
+      }
+    }
+  },
+  "find_next_greater_element": {
+    "name": "find_next_greater_element",
+    "description": "Finds the next greater element for each element in a list.",
+    "slots": {
+      "nums": {
+        "type": "List[int]",
+        "optional": false,
+        "description": "The list of numbers."
+      }
+    }
+  },
+  "euclidean_distance": {
+    "name": "euclidean_distance",
+    "description": "Computes the Euclidean distance between two points in a 2D plane.",
+    "slots": {
+      "point_a": {
+        "type": "Tuple[float, float]",
+        "optional": false,
+        "description": "The coordinates of the first point (x, y)."
+      },
+      "point_b": {
+        "type": "Tuple[float, float]",
+        "optional": false,
+        "description": "The coordinates of the second point (x, y)."
+      }
+    }
+  },
+  "is_perfect_square": {
+    "name": "is_perfect_square",
+    "description": "Checks if a number is a perfect square.",
+    "slots": {
+      "num": {
+        "type": "int",
+        "optional": false,
+        "description": "The number to check."
+      }
+    }
+  },
+  "sort_numbers": {
+    "name": "sort_numbers",
+    "description": "Sorts a list of numbers in ascending or descending order.",
+    "slots": {
+      "numbers": {
+        "type": "List[float]",
+        "optional": false,
+        "description": "The list of numbers to be sorted."
+      },
+      "descending": {
+        "type": "bool, optional",
+        "optional": true,
+        "description": "If True, sorts the numbers in descending order. Defaults to False.",
+        "default": false
+      }
+    }
+  },
+  "calculate_electric_field": {
+    "name": "calculate_electric_field",
+    "description": "Calculate the electric field produced by a charge at a certain distance.",
+    "slots": {
+      "charge": {
+        "type": "int",
+        "optional": true,
+        "description": "Charge in coulombs producing the electric field."
+      },
+      "distance": {
+        "type": "int",
+        "optional": true,
+        "description": "Distance from the charge in meters where the field is being measured."
+      },
+      "permitivity": {
+        "type": "float",
+        "optional": false,
+        "description": "Permitivity of the space where field is being calculated, default is 8.854e-12."
+      }
+    }
+  },
+  "dice_roll_probability": {
+    "name": "dice_roll_probability",
+    "description": "Calculates the probability of rolling a specific sum with a given number of dice, each having a certain number of faces.",
+    "slots": {
+      "target_sum": {
+        "type": "int",
+        "optional": true,
+        "description": "The target sum to calculate the probability for."
+      },
+      "num_dice": {
+        "type": "int",
+        "optional": true,
+        "description": "The number of dice being rolled."
+      },
+      "num_faces": {
+        "type": "int, optional",
+        "optional": true,
+        "description": "The number of faces on each die. Defaults to 6.",
+        "default": 6
+      }
+    }
+  },
+  "triangle_area": {
+    "name": "triangle_area",
+    "description": "Computes the area of a triangle given its base and height.",
+    "slots": {
+      "base": {
+        "type": "float",
+        "optional": false,
+        "description": "The length of the base of the triangle."
+      },
+      "height": {
+        "type": "float",
+        "optional": false,
+        "description": "The height of the triangle."
+      }
+    }
+  },
+  "final_velocity": {
+    "name": "final_velocity",
+    "description": "Calculates the final velocity of an object given its initial velocity, acceleration, and time.",
+    "slots": {
+      "initial_velocity": {
+        "type": "float",
+        "optional": false,
+        "description": "The initial velocity of the object."
+      },
+      "acceleration": {
+        "type": "float",
+        "optional": false,
+        "description": "The acceleration of the object."
+      },
+      "time": {
+        "type": "float",
+        "optional": false,
+        "description": "The time elapsed."
+      }
+    }
+  },
+  "future_investment_value": {
+    "name": "future_investment_value",
+    "description": "Calculates the future value of an investment based on the present value, annual interest rate, and number of years.",
+    "slots": {
+      "present_value": {
+        "type": "float",
+        "optional": false,
+        "description": "The present value of the investment."
+      },
+      "annual_interest_rate": {
+        "type": "float",
+        "optional": false,
+        "description": "The annual interest rate as a decimal (e.g., 0.05 for 5%)."
+      },
+      "years": {
+        "type": "int",
+        "optional": false,
+        "description": "The number of years the investment will grow."
+      }
+    }
+  },
+  "neuronal_activity_rate": {
+    "name": "neuronal_activity_rate",
+    "description": "Calculates the neuronal activity rate based on the synaptic input rate, synaptic weight, and decay constant.",
+    "slots": {
+      "synaptic_input_rate": {
+        "type": "int",
+        "optional": true,
+        "description": "The rate of synaptic inputs per second."
+      },
+      "synaptic_weight": {
+        "type": "float, optional",
+        "optional": true,
+        "description": "The weight of the synaptic input, denoting its influence. Defaults to 1.0.",
+        "default": 1.0
+      },
+      "decay_constant": {
+        "type": "float, optional",
+        "optional": true,
+        "description": "The rate at which the neuron's potential decays. Defaults to 0.1.",
+        "default": 0.1
+      }
+    }
+  },
+  "average": {
+    "name": "average",
+    "description": "Calculates the arithmetic mean of a list of numbers.",
+    "slots": {
+      "numbers": {
+        "type": "List[float]",
+        "optional": false,
+        "description": "The list of numbers."
+      }
+    }
+  },
+  "solve_quadratic": {
+    "name": "solve_quadratic",
+    "description": "Computes the roots of a quadratic equation given its coefficients.",
+    "slots": {
+      "a": {
+        "type": "float",
+        "optional": false,
+        "description": "The coefficient of the quadratic term (x^2)."
+      },
+      "b": {
+        "type": "float",
+        "optional": false,
+        "description": "The coefficient of the linear term (x)."
+      },
+      "c": {
+        "type": "float",
+        "optional": false,
+        "description": "The constant term."
+      }
+    }
+  },
+  "is_power": {
+    "name": "is_power",
+    "description": "Checks if a number is a power of a given base.",
+    "slots": {
+      "num": {
+        "type": "int",
+        "optional": false,
+        "description": "The number to check."
+      },
+      "base": {
+        "type": "int",
+        "optional": false,
+        "description": "The base to check against."
+      }
+    }
+  },
+  "polygon_area_shoelace": {
+    "name": "polygon_area_shoelace",
+    "description": "Calculates the area of a polygon using the shoelace formula.",
+    "slots": {
+      "vertices": {
+        "type": "List[Tuple[float, float]]",
+        "optional": false,
+        "description": "A list of polygon vertices represented as tuples (x, y)."
+      }
+    }
+  },
+  "bacterial_growth": {
+    "name": "bacterial_growth",
+    "description": "Calculates the bacterial population after a given time based on the initial population and growth rate.",
+    "slots": {
+      "initial_population": {
+        "type": "int",
+        "optional": true,
+        "description": "The initial bacterial population."
+      },
+      "growth_rate": {
+        "type": "float",
+        "optional": true,
+        "description": "The growth rate per unit time."
+      },
+      "time": {
+        "type": "float",
+        "optional": false,
+        "description": "The time elapsed."
+      },
+      "doubling_time": {
+        "type": "float, optional",
+        "optional": true,
+        "description": "The doubling time of the bacteria in minutes. Defaults to 20.",
+        "default": 20.0
+      }
+    }
+  },
+  "calculate_median": {
+    "name": "calculate_median",
+    "description": "Calculates the median of a list of numbers.",
+    "slots": {
+      "numbers": {
+        "type": "List[Union[int, float]]",
+        "optional": false,
+        "description": "The list of numbers."
+      }
+    }
+  },
+  "std_deviation": {
+    "name": "std_deviation",
+    "description": "Calculates the standard deviation of a list of numbers.",
+    "slots": {
+      "numbers": {
+        "type": "List[float]",
+        "optional": false,
+        "description": "The list of numbers."
+      }
+    }
+  },
+  "calculate_standard_deviation": {
+    "name": "calculate_standard_deviation",
+    "description": "Calculates the standard deviation of a list of numbers.",
+    "slots": {
+      "numbers": {
+        "type": "List[Union[int, float]]",
+        "optional": false,
+        "description": "The list of numbers."
+      }
+    }
+  },
+  "is_power_of_two": {
+    "name": "is_power_of_two",
+    "description": "Checks if a number is a power of two.",
+    "slots": {
+      "num": {
+        "type": "int",
+        "optional": false,
+        "description": "The number to check."
+      }
+    }
+  },
+  "calculate_investment_return": {
+    "name": "calculate_investment_return",
+    "description": "Calculates the return on investment based on the initial deposit amount, annual interest rate, and investment period.",
+    "slots": {
+      "initial_amount": {
+        "type": "int",
+        "optional": false,
+        "description": "The initial deposit amount."
+      },
+      "interest_rate": {
+        "type": "float",
+        "optional": false,
+        "description": "The annual interest rate provided by the bank."
+      },
+      "num_years": {
+        "type": "int",
+        "optional": false,
+        "description": "The number of years the money is invested."
+      }
+    }
+  },
+  "binary_addition": {
+    "name": "binary_addition",
+    "description": "Adds two binary numbers and returns the result as a binary string.",
+    "slots": {
+      "a": {
+        "type": "str",
+        "optional": false,
+        "description": "The first binary number."
+      },
+      "b": {
+        "type": "str",
+        "optional": false,
+        "description": "The second binary number."
+      }
+    }
+  },
+  "min_meeting_rooms": {
+    "name": "min_meeting_rooms",
+    "description": "Finds the minimum number of meeting rooms required to accommodate all meetings.",
+    "slots": {
+      "intervals": {
+        "type": "List[List[int]]",
+        "optional": false,
+        "description": "A list of meeting time intervals, where each interval is represented as [start_time, end_time]."
+      }
+    }
+  },
+  "find_n_largest_numbers": {
+    "name": "find_n_largest_numbers",
+    "description": "Finds the n largest numbers in a list.",
+    "slots": {
+      "nums": {
+        "type": "List[int]",
+        "optional": false,
+        "description": "The list of numbers."
+      },
+      "n": {
+        "type": "int",
+        "optional": false,
+        "description": "The number of largest numbers to find."
+      }
+    }
+  },
+  "chi_square_independence_test": {
+    "name": "chi_square_independence_test",
+    "description": "Performs a Chi-Square test for independence on a 2x2 contingency table.",
+    "slots": {
+      "contingency_table": {
+        "type": "List[List[int]]",
+        "optional": true,
+        "description": "A 2x2 contingency table represented as a list of lists."
+      },
+      "significance_level": {
+        "type": "float, optional",
+        "optional": true,
+        "description": "The significance level for the Chi-Square test. Defaults to 0.05.",
+        "default": 0.05
+      }
+    }
+  },
+  "get_product": {
+    "name": "get_product",
+    "description": "Fetches product details from a RapidAPI endpoint using the provided product ID and RapidAPI key.",
+    "slots": {
+      "is_id": {
+        "type": "int",
+        "optional": true,
+        "description": "The ID of the product to retrieve information about."
+      }
+    }
+  },
+  "loginuser": {
+    "name": "loginuser",
+    "description": "Logs a user into the system using the provided username and password.",
+    "slots": {
+      "password": {
+        "type": "str",
+        "optional": true,
+        "description": "The password for login in clear text."
+      },
+      "username": {
+        "type": "str",
+        "optional": true,
+        "description": "The username for login."
+      }
+    }
+  },
+  "circle_area": {
+    "name": "circle_area",
+    "description": "Computes the area of a circle given its radius.",
+    "slots": {
+      "radius": {
+        "type": "float",
+        "optional": false,
+        "description": "The radius of the circle."
+      }
+    }
+  },
+  "batting_average": {
+    "name": "batting_average",
+    "description": "Calculates the batting average of a baseball player based on the number of hits and at-bats.",
+    "slots": {
+      "num_hits": {
+        "type": "int",
+        "optional": true,
+        "description": "The number of hits."
+      },
+      "num_at_bats": {
+        "type": "int",
+        "optional": true,
+        "description": "The number of at-bats."
+      },
+      "precision": {
+        "type": "int, optional",
+        "optional": true,
+        "description": "The number of decimal places to round the batting average. Defaults to 3.",
+        "default": 3
+      }
+    }
+  },
+  "find_max_subarray_sum": {
+    "name": "find_max_subarray_sum",
+    "description": "Finds the maximum sum of a contiguous subarray within a list of integers.",
+    "slots": {
+      "nums": {
+        "type": "List[int]",
+        "optional": false,
+        "description": "The input list of integers."
+      }
+    }
+  },
+  "reverse_string": {
+    "name": "reverse_string",
+    "description": "Reverses the characters in a string.",
+    "slots": {
+      "text": {
+        "type": "str",
+        "optional": false,
+        "description": "The input string."
+      }
+    }
+  },
+  "generate_password": {
+    "name": "generate_password",
+    "description": "Generates a random password of specified length and character types.",
+    "slots": {
+      "length": {
+        "type": "int, optional",
+        "optional": true,
+        "description": "The length of the password. Defaults to 12.",
+        "default": 12
+      },
+      "include_special": {
+        "type": "bool, optional",
+        "optional": true,
+        "description": "Whether to include special characters in the password. Defaults to True.",
+        "default": true
+      }
+    }
+  },
+  "is_sum_of_cubes": {
+    "name": "is_sum_of_cubes",
+    "description": "Checks if a number is the sum of the cubes of its digits.",
+    "slots": {
+      "num": {
+        "type": "int",
+        "optional": false,
+        "description": "The number to check."
+      }
+    }
+  },
+  "merge_sorted_lists": {
+    "name": "merge_sorted_lists",
+    "description": "Merges two sorted lists into a single sorted list.",
+    "slots": {
+      "list1": {
+        "type": "List[int]",
+        "optional": false,
+        "description": "The first sorted list."
+      },
+      "list2": {
+        "type": "List[int]",
+        "optional": false,
+        "description": "The second sorted list."
+      }
+    }
+  },
+  "is_valid_ip_address": {
+    "name": "is_valid_ip_address",
+    "description": "Checks if a string is a valid IP address (IPv4).",
+    "slots": {
+      "ip": {
+        "type": "str",
+        "optional": false,
+        "description": "The string to check."
+      }
+    }
+  },
+  "get_ip_zipcode": {
+    "name": "get_ip_zipcode",
+    "description": "Retrieves the ZIP code of a given IP address using the ip-api.com API.",
+    "slots": {
+      "ip": {
+        "type": "str",
+        "optional": false,
+        "description": "The IP address to locate."
+      }
+    }
+  },
+  "is_leap_year": {
+    "name": "is_leap_year",
+    "description": "Checks if a year is a leap year.",
+    "slots": {
+      "year": {
+        "type": "int",
+        "optional": false,
+        "description": "The year to check."
+      }
+    }
+  },
+  "project_investment_growth": {
+    "name": "project_investment_growth",
+    "description": "Projects the growth of an investment over a specified number of years.",
+    "slots": {
+      "principal": {
+        "type": "float",
+        "optional": true,
+        "description": "The initial investment amount."
+      },
+      "annual_addition": {
+        "type": "float",
+        "optional": true,
+        "description": "The amount added to the investment annually."
+      },
+      "years": {
+        "type": "int",
+        "optional": false,
+        "description": "The number of years to project the investment growth."
+      },
+      "return_rate": {
+        "type": "float",
+        "optional": false,
+        "description": "The annual return rate as a decimal (e.g., 0.07 for 7%)."
+      },
+      "inflation": {
+        "type": "List[float]",
+        "optional": false,
+        "description": "A list of annual inflation rates as decimals."
+      },
+      "inflation_adjusted": {
+        "type": "bool, optional",
+        "optional": true,
+        "description": "Whether to adjust the final value for inflation. Defaults to True.",
+        "default": true
+      }
+    }
+  },
+  "predict_forest_area": {
+    "name": "predict_forest_area",
+    "description": "Predicts the change in forest area over a specified number of years.",
+    "slots": {
+      "location": {
+        "type": "str",
+        "optional": false,
+        "description": "The geographic location for the prediction."
+      },
+      "num_years": {
+        "type": "int",
+        "optional": false,
+        "description": "The number of years into the future to make the prediction."
+      },
+      "include_humans": {
+        "type": "bool, optional",
+        "optional": true,
+        "description": "Whether to include the impact of human activities in the prediction. Defaults to False.",
+        "default": true
+      }
+    }
+  },
+  "get_ip_location": {
+    "name": "get_ip_location",
+    "description": "Retrieves the latitude and longitude coordinates of a given IP address using the ip-api.com API.",
+    "slots": {
+      "ip": {
+        "type": "str",
+        "optional": false,
+        "description": "The IP address to locate."
+      }
+    }
+  },
+  "analyze_social_group_dynamics": {
+    "name": "analyze_social_group_dynamics",
+    "description": "Analyzes the social dynamics within a group based on the personality traits and group size.",
+    "slots": {
+      "total": {
+        "type": "int",
+        "optional": false,
+        "description": "The total group size."
+      },
+      "extroverts": {
+        "type": "int",
+        "optional": false,
+        "description": "The number of extroverted members in the group."
+      },
+      "introverts": {
+        "type": "int",
+        "optional": false,
+        "description": "The number of introverted members in the group."
+      }
+    }
+  },
+  "assess_diabetes_risk": {
+    "name": "assess_diabetes_risk",
+    "description": "Assesses the risk of developing type 2 diabetes based on body mass index (BMI) and physical activity level.",
+    "slots": {
+      "weight_lbs": {
+        "type": "int",
+        "optional": false,
+        "description": "Body weight in pounds."
+      },
+      "height_inches": {
+        "type": "int",
+        "optional": false,
+        "description": "Height in inches."
+      },
+      "activity": {
+        "type": "str",
+        "optional": false,
+        "description": "Physical activity level. Allowed values: \"sedentary\", \"lightly active\", \"moderately active\", or \"very active\"."
+      }
+    }
+  },
+  "structural_analysis": {
+    "name": "structural_analysis",
+    "description": "Performs structural analysis on a building based on its ID, floor numbers, and analysis mode.",
+    "slots": {
+      "building_id": {
+        "type": "str",
+        "optional": true,
+        "description": "The unique identifier of the building."
+      },
+      "floor_numbers": {
+        "type": "List[int]",
+        "optional": true,
+        "description": "The list of floor numbers to be analyzed."
+      },
+      "analysis_mode": {
+        "type": "str, optional",
+        "optional": true,
+        "description": "The mode of analysis, either \"static\" or \"dynamic\". Defaults to \"static\".",
+        "default": "static"
+      }
+    }
+  },
+  "get_pokemon_move_info": {
+    "name": "get_pokemon_move_info",
+    "description": "Retrieves information about a Pok\u00e9mon's move using the Pok\u00e9API.",
+    "slots": {
+      "pokemon_name": {
+        "type": "str",
+        "optional": true,
+        "description": "The name of the Pok\u00e9mon."
+      },
+      "move_name": {
+        "type": "str, optional",
+        "optional": true,
+        "description": "The name of the move to check. Defaults to \"run\".",
+        "default": "run"
+      }
+    }
+  },
+  "get_city_from_zipcode": {
+    "name": "get_city_from_zipcode",
+    "description": "Retrieves the city name for a given ZIP code using the Ziptastic API.",
+    "slots": {
+      "zipcode": {
+        "type": "str",
+        "optional": false,
+        "description": "The ZIP code to look up."
+      }
+    }
+  },
+  "search": {
+    "name": "search",
+    "description": "This function performs a search query using the Market Intelligence by Automata API, returning information about related companies based on the provided search terms.",
+    "slots": {
+      "terms": {
+        "type": "str",
+        "optional": true,
+        "description": "Search terms separated by commas, which are used to filter the companies. Example: 'cloud computing,enterprise,security'."
+      },
+      "page": {
+        "type": "str, optional",
+        "optional": true,
+        "description": "Page number for paginated search results. Default is '0'. Example: '0', '1', '2', etc.",
+        "default": "0"
+      }
+    }
+  },
+  "auto_complete": {
+    "name": "auto_complete",
+    "description": "Fetch auto-complete suggestions based on a given term or phrase, with optional country specification.",
+    "slots": {
+      "prefix": {
+        "type": "str",
+        "optional": true,
+        "description": "The term or phrase to get auto-complete suggestions for."
+      },
+      "country": {
+        "type": "str, optional",
+        "optional": true,
+        "description": "The country code for the suggestions (e.g., 'it' for Italy, 'es' for Spain, 'pt' for Portugal). Defaults to 'it'.",
+        "default": "it"
+      }
+    }
+  }
+}
