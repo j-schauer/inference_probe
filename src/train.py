@@ -2,7 +2,37 @@
 """
 Training script for probe-based slot extraction.
 
-Trains LoRA adapters + probe heads on Llama 8B for slot extraction.
+WHAT THIS DOES:
+    Instead of asking an LLM to generate text like '{"origin": "Seattle"}',
+    we read the model's internal state directly to find where slot values are.
+
+    The model processes: "Book flight from Seattle\n\norigin:"
+    We read the hidden state at "origin:" and ask: "where in the input is the value?"
+    Answer: position 4 (the token "Seattle")
+
+HOW IT WORKS:
+    1. Load Llama 8B with LoRA adapters (small trainable matrices)
+    2. Create two "probe" classifiers:
+       - NullHead: "Is this slot mentioned?" (yes/no)
+       - PointerHead: "Which tokens are the value?" (start/end positions)
+    3. Train everything together - LoRA teaches the model the format,
+       probes learn to read the answers from the model's internal state
+
+EXECUTION FLOW:
+    load_model_with_lora()  →  Load Llama, add LoRA, freeze base weights
+              ↓
+    Create NullHead + PointerHead (random initialization)
+              ↓
+    Load dataset (ProbeDataset)
+              ↓
+    Training loop:
+        for each batch:
+            hidden = forward pass through LLM
+            loss = compute_loss(hidden, probes, labels)
+            loss.backward()  →  gradients flow to LoRA + probes
+            optimizer.step()  →  update weights
+              ↓
+    Save LoRA adapter + probe heads
 
 Usage:
     python train.py --data ../data --model meta-llama/Llama-3.1-8B-Instruct
@@ -40,29 +70,47 @@ CONFIG = {
 
 
 def load_model_with_lora(config):
-    """Load base model with LoRA adapters."""
+    """
+    Load Llama model and wrap it with LoRA adapters.
+
+    LoRA (Low-Rank Adaptation) adds small trainable matrices to the attention layers.
+    Instead of training all 8 billion parameters, we freeze the base model and only
+    train ~8 million LoRA parameters. This teaches the model our input format without
+    destroying its general knowledge.
+
+    Returns:
+        model: Llama wrapped with LoRA (base frozen, LoRA trainable)
+        tokenizer: Converts text ↔ token IDs
+        hidden_size: Dimension of hidden states (4096 for Llama 8B)
+        device: GPU or CPU
+    """
     from transformers import AutoModelForCausalLM, AutoTokenizer
     from peft import LoraConfig, get_peft_model
 
     print(f"Loading model: {config['model_path']}")
 
+    # Tokenizer converts text to token IDs and back
     tokenizer = AutoTokenizer.from_pretrained(config["model_path"])
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    # Load the base Llama model (8 billion parameters)
     model = AutoModelForCausalLM.from_pretrained(
         config["model_path"],
-        torch_dtype=torch.bfloat16,
+        torch_dtype=torch.bfloat16,  # Half precision to save memory
         device_map=None,
         trust_remote_code=True,
     ).to(device)
 
-    model.config.use_cache = False
-    hidden_size = model.config.hidden_size
+    model.config.use_cache = False  # Disable KV cache during training
+    hidden_size = model.config.hidden_size  # 4096 for Llama 8B
     print(f"Hidden size: {hidden_size}")
 
+    # LoRA config: which layers to adapt and how
+    # target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"] = all attention matrices
+    # r=16 means low-rank matrices are 16-dimensional (small but effective)
     lora_config = LoraConfig(
         r=config["lora_r"],
         lora_alpha=config["lora_alpha"],
@@ -72,21 +120,33 @@ def load_model_with_lora(config):
         task_type="CAUSAL_LM"
     )
 
+    # Wrap model with LoRA - this freezes base weights and adds trainable adapters
     model = get_peft_model(model, lora_config)
-    model.print_trainable_parameters()
+    model.print_trainable_parameters()  # Shows: "trainable: 8M/8B (0.1%)"
 
     return model, tokenizer, hidden_size, device
 
 
 def get_hidden_states(model, input_ids, attention_mask):
     """
-    Extract post-RMSNorm hidden states from the model.
+    Run the LLM and extract hidden states from the final layer.
 
-    Uses last_hidden_state explicitly to ensure consistency.
+    When you feed N tokens into a transformer, you get N hidden state vectors out.
+    Each vector is 4096-dimensional (for Llama 8B) and encodes what the model
+    "knows" at that position after processing the entire sequence.
+
+    We read from INSIDE the model (after layer 32, before the output projection).
+    This is where the model has done all its "thinking" but hasn't yet converted
+    to vocabulary probabilities.
+
+    Input:  [batch_size, seq_len] token IDs
+    Output: [batch_size, seq_len, 4096] hidden states
     """
+    # Navigate through PEFT wrapper to get the inner Llama model
     base = model.base_model.model if hasattr(model, "base_model") else model
     llama = base.model if hasattr(base, "model") else base
 
+    # Forward pass - processes all tokens in parallel via self-attention
     outputs = llama(
         input_ids=input_ids,
         attention_mask=attention_mask,
@@ -95,15 +155,35 @@ def get_hidden_states(model, input_ids, attention_mask):
         use_cache=False,
     )
 
+    # last_hidden_state: the output of layer 32 + final RMSNorm
+    # Shape: [batch_size, seq_len, 4096]
     return outputs.last_hidden_state
 
 
 def compute_loss(model, pointer_head, null_head, batch, device):
-    """Compute combined NullHead + PointerHead loss."""
+    """
+    THE CORE LEARNING MECHANISM
+
+    This function computes the loss that trains both probes. Here's what happens:
+
+    1. Run the LLM forward pass to get hidden states for all tokens
+    2. For each slot in the schema (e.g., "origin", "destination", "date"):
+       a. Find the hidden state at the slot marker position (e.g., at "origin:")
+       b. Ask NullHead: "Is this slot present?" → compare to ground truth
+       c. If present, ask PointerHead: "Where is it?" → compare to gold positions
+
+    The loss is cross-entropy, which treats this as classification:
+    - NullHead: 2-class classification (present vs absent)
+    - PointerHead: seq_len-class classification (which position is the start/end)
+
+    Training pushes the correct class's score up and others down.
+    """
     input_ids = batch["input_ids"].to(device)
     attention_mask = batch["attention_mask"].to(device)
-    valid_mask = batch["valid_mask"].to(device)
+    valid_mask = batch["valid_mask"].to(device)  # True only for utterance tokens
 
+    # STEP 1: Forward pass through the LLM
+    # hidden shape: [batch_size, seq_len, 4096]
     hidden = get_hidden_states(model, input_ids, attention_mask)
 
     null_loss = torch.tensor(0.0, device=device)
@@ -114,28 +194,37 @@ def compute_loss(model, pointer_head, null_head, batch, device):
     batch_size = input_ids.size(0)
     seq_len = input_ids.size(1)
 
+    # STEP 2: Process each example in the batch
     for b in range(batch_size):
-        example_hidden = hidden[b]
+        example_hidden = hidden[b]  # [seq_len, 4096]
         example_valid_mask = valid_mask[b].unsqueeze(0)
-        utt_start = batch["utterance_start"][b]
+        utt_start = batch["utterance_start"][b]  # Where utterance begins in sequence
 
+        # STEP 3: For each slot in the schema...
         for slot_name, query_pos in batch["query_positions"][b].items():
             label = batch["labels"][b][slot_name]
 
             if query_pos < 0 or query_pos >= seq_len:
                 continue
 
-            q = example_hidden[query_pos]
+            # STEP 4: Get the "query" - the hidden state at the slot marker
+            # e.g., if "origin:" is at token 47, q = hidden[47]
+            # This 4096-dim vector encodes "what is the origin value?"
+            q = example_hidden[query_pos]  # [4096]
 
-            # NullHead loss (always)
+            # STEP 5: NullHead - "Is this slot present in the utterance?"
+            # null_logits: [2] scores for [present, absent]
             null_logits = null_head(q)
             present_target = torch.tensor(0 if label["present"] else 1, device=device)
+            # Cross-entropy: push correct class score up, others down
             loss_null = F.cross_entropy(null_logits, present_target.unsqueeze(0))
             null_loss = null_loss + loss_null
             n_null += 1
 
-            # PointerHead loss (only if present)
+            # STEP 6: PointerHead - "Where does the value start and end?"
+            # Only compute if the slot is actually present
             if label["present"]:
+                # Convert utterance-relative positions to sequence-absolute
                 gold_start = utt_start + label["start"]
                 gold_end = utt_start + label["end"]
 
@@ -144,6 +233,8 @@ def compute_loss(model, pointer_head, null_head, batch, device):
                 if not valid_mask[b, gold_start] or not valid_mask[b, gold_end]:
                     continue
 
+                # PointerHead compares query against ALL positions
+                # Returns: [seq_len] scores for start, [seq_len] scores for end
                 start_logits, end_logits = pointer_head(
                     q.unsqueeze(0),
                     example_hidden.unsqueeze(0),
@@ -153,11 +244,14 @@ def compute_loss(model, pointer_head, null_head, batch, device):
                 gold_start_t = torch.tensor(gold_start, device=device)
                 gold_end_t = torch.tensor(gold_end, device=device)
 
+                # Cross-entropy treats positions as classes
+                # "The correct answer is position 4" → push position 4's score up
                 loss_start = F.cross_entropy(start_logits, gold_start_t.unsqueeze(0))
                 loss_end = F.cross_entropy(end_logits, gold_end_t.unsqueeze(0))
                 ptr_loss = ptr_loss + loss_start + loss_end
                 n_ptr += 1
 
+    # Average the losses
     avg_null = null_loss / max(n_null, 1)
     avg_ptr = ptr_loss / max(2 * n_ptr, 1) if n_ptr > 0 else torch.tensor(0.0, device=device)
     total_loss = avg_null + avg_ptr
