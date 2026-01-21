@@ -1,0 +1,9 @@
+# Core
+torch>=2.0.0
+transformers>=4.40.0
+peft>=0.10.0
+accelerate>=0.27.0
+safetensors>=0.4.0
+
+# Optional: for faster tokenization
+tokenizers>=0.15.0

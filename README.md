@@ -14,6 +14,7 @@ probe_public/
 ├── README.md          ← You are here
 ├── SCIENCE.md         ← General background on probing techniques
 ├── PROBE.md           ← This project's implementation details
+├── requirements.txt   ← Python dependencies
 │
 ├── data/
 │   ├── DATA_CARD.md                   # Data provenance and format
@@ -34,11 +35,47 @@ probe_public/
     └── MULTI_MODEL.md      # Results on other models (Qwen, OLMo, etc.)
 ```
 
+## Requirements
+
+- **Python**: 3.10 or 3.11
+- **GPU**: CUDA-capable, 24GB+ VRAM recommended (A10G, A100, RTX 3090/4090)
+- **Llama access**: Requires approved access to `meta-llama/Llama-3.1-8B-Instruct` on HuggingFace
+
+### Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+Dependencies:
+- `torch>=2.0.0` (with CUDA)
+- `transformers>=4.40.0`
+- `peft>=0.10.0`
+- `accelerate>=0.27.0`
+- `safetensors>=0.4.0`
+
+### HuggingFace Setup
+
+```bash
+# Login to access Llama
+huggingface-cli login
+
+# You must have accepted Meta's license at:
+# https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct
+```
+
 ## Quick Start
 
-1. Read [PROBE.md](PROBE.md) to understand the approach
-2. Review the data format in `data/DATA_CARD.md`
-3. Run training with `src/train.py` (requires GPU, see [modal/MODAL_GUIDE.md](modal/MODAL_GUIDE.md) for cloud setup)
+**Local (if you have a GPU):**
+```bash
+cd src
+python train.py --data ../data --epochs 1
+```
+
+**Cloud (Modal.com, ~$0.50):**
+See [modal/MODAL_GUIDE.md](modal/MODAL_GUIDE.md)
+
+For details on the approach, see [PROBE.md](PROBE.md).
 
 ## Results
 
