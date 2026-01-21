@@ -1,6 +1,21 @@
-# Probe-Based Slot Extraction
+# Reading LLM Internal State Instead of Generating Text
 
-This project extracts slot values from natural language by reading the internal state of a large language model, rather than having it generate text.
+## The Big Question
+
+When an LLM processes a prompt, it builds up internal representations (hidden states) before generating any output tokens. **Can we read those internal states directly to get answers, skipping text generation entirely?**
+
+If yes, this could mean:
+- **10x faster inference** (one forward pass vs. autoregressive generation)
+- **No hallucination** (pointing to input positions, not generating new text)
+- **No parsing failures** (no JSON to parse)
+
+## Background
+
+This builds on work in neural network interpretability called **probing** (Alain & Bengio 2016, Hewitt & Manning 2019). The core idea: if a simple classifier can extract information from a model's hidden states, then the model has learned to encode that information internally. We apply this to a practical task: can we replace text generation with state-reading for structured extraction?
+
+## The Experiment: Slot Extraction
+
+We test this with **slot extraction** - identifying values like "Seattle" and "Denver" from "Book a flight from Seattle to Denver."
 
 ```
 Input:  "Book a flight from Seattle to Denver tomorrow"
@@ -8,27 +23,15 @@ Input:  "Book a flight from Seattle to Denver tomorrow"
 Output: origin=Seattle, destination=Denver, date=tomorrow
 ```
 
-One forward pass, ~20ms. No text generation, no JSON parsing.
+Traditional approach: LLM generates `{"origin": "Seattle", ...}` → parse JSON (200-500ms)
 
-## The Core Idea
+Our approach: Read LLM hidden states → point to positions 4 and 6 → extract tokens (20ms)
 
-When you ask an LLM to extract slots, it already "knows" the answer internally before it starts generating tokens. We tap into that internal knowledge directly using lightweight classifiers called **probes**.
+## Results
 
-### Why Not Just Generate?
+**It works.** 98.6% exact match accuracy, ~20ms per utterance.
 
-Traditional approach:
-```
-Input → LLM generates → '{"origin": "Seattle", "destination": "Denver"}' → Parse JSON
-```
-
-Problems: Slow (200-500ms), can hallucinate, JSON parsing can fail.
-
-Probe approach:
-```
-Input → LLM internal state → Probe points to positions → Extract "Seattle", "Denver"
-```
-
-Benefits: Fast (20ms), no hallucination (just points to input), no parsing.
+The rest of this README explains how.
 
 ## How It Works
 
